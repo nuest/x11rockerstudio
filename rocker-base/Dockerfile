@@ -1,0 +1,79 @@
+FROM rocker/verse
+
+# copy of https://hub.docker.com/r/x11docker/lxde/~/dockerfile/
+RUN apt-get update
+RUN apt-get install -y apt-utils
+RUN apt-get install -y dbus-x11 x11-utils x11-xserver-utils
+RUN apt-get install -y procps psmisc
+RUN apt-get install -y --no-install-recommends lxde
+
+# some utils to have proper menus, mime file types etc.
+RUN apt-get install -y --no-install-recommends xdg-utils xdg-user-dirs
+RUN apt-get install -y menu menu-xdg mime-support desktop-file-utils desktop-base
+
+# OpenGL support
+RUN apt-get install -y libxv1 mesa-utils mesa-utils-extra libgl1-mesa-glx libglew2.0 \
+                       libglu1-mesa libgl1-mesa-dri libdrm2 libgles2-mesa libegl1-mesa
+RUN apt-get install -y procps
+
+# config for lxpanel, including replacement for lxsession-logout
+RUN mkdir -p /etc/skel/.config/lxpanel/default
+
+RUN echo '[Command]\n\
+Logout=pkill lxpanel\n\
+FileManager=pcmanfm %s \n\
+Terminal=xterm -e \n\
+' > /etc/skel/.config/lxpanel/default/config
+
+# pcmanfm config to get nice wallpaper
+RUN mkdir -p /etc/skel/.config/pcmanfm/default
+RUN echo '[*]\n\
+wallpaper_mode=stretch\n\
+wallpaper_common=1\n\
+wallpaper=/usr/share/lxde/wallpapers/lxde_blue.jpg\n\
+show_documents=1\n\
+show_trash=1\n\
+show_mounts=1\n\
+' > /etc/skel/.config/pcmanfm/default/desktop-items-0.conf
+
+# GTK 2+3 settings for icons and style
+RUN mkdir -p /etc/skel/.config/gtk-3.0
+RUN echo '\n\
+gtk-theme-name="Raleigh"\n\
+gtk-icon-theme-name="nuoveXT2"\n\
+' > /etc/skel/.gtkrc-2.0
+RUN echo '\n\
+[Settings]\n\
+gtk-theme-name="Raleigh"\n\
+gtk-icon-theme-name="nuoveXT2"\n\
+' > /etc/skel/.config/gtk-3.0/settings.ini
+
+# create startscript
+RUN echo '#! /bin/bash\n\
+if [ ! -e "$HOME/.config" ] ; then\n\
+  cp -R /etc/skel/. $HOME/ \n\
+  cp -R /etc/skel/* $HOME/ \n\
+fi\n\
+if [ "$*" = "" ] ; then \n\
+  openbox --sm-disable &\n\
+  pcmanfm --desktop &\n\
+  lxpanel \n\
+else \n\
+  eval $* \n\
+fi \n\
+' > /usr/local/bin/start 
+
+RUN chmod +x /usr/local/bin/start 
+CMD start
+
+# Install RStudio
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    libssl1.0.2 \
+    libgstreamer1.0-0 \
+    libgstreamer-plugins-base1.0-0 \
+    libxslt1-dev
+
+WORKDIR /tmp
+RUN wget https://download1.rstudio.org/rstudio-xenial-1.0.153-amd64.deb
+RUN dpkg -i rstudio-xenial-1.0.153-amd64.deb
