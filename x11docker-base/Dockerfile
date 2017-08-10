@@ -20,5 +20,5 @@ RUN apt-key adv --keyserver keys.gnupg.net --recv-key 'E19F5F87128899B192B1A2C2A
 
 WORKDIR /tmp
 
-RUN wget https://download1.rstudio.org/rstudio-xenial-1.0.153-amd64.deb \
+RUN wget -q https://download1.rstudio.org/rstudio-xenial-1.0.153-amd64.deb \
   && dpkg -i rstudio-xenial-1.0.153-amd64.deb

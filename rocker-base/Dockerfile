@@ -75,5 +75,5 @@ RUN apt-get update \
     libxslt1-dev
 
 WORKDIR /tmp
-RUN wget https://download1.rstudio.org/rstudio-xenial-1.0.153-amd64.deb
+RUN wget -q https://download1.rstudio.org/rstudio-xenial-1.0.153-amd64.deb
 RUN dpkg -i rstudio-xenial-1.0.153-amd64.deb
