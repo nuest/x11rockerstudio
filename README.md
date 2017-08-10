@@ -12,6 +12,10 @@ Both these projects use Debian base images, which helps a lot.
 
 Another approach is sharing the host's X11 socket as shown by [Fábio Rehm](http://fabiorehm.com/blog/2014/09/11/running-gui-apps-with-docker/) (originally [for Netbeans](https://github.com/fgrehm/docker-netbeans)).
 
+A third approach is [Subuser](http://subuser.org). It _"turns Docker containers into normal linux programs"_. Its focus lies on isolated and consistent environments for programmes.
+
+**Are you aware of any other approaches? Great! Please open an issue.**
+
 ## Results
 
 ### x11docker base image with R
@@ -65,7 +69,31 @@ docker run -it --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix rstudio
 
 You can even create one Docker image that has both RStudio variants if you use `rocker/rstudio` as the base image.
 
+### Subuser
 
+[**WORK IN PROGRESS**](https://github.com/nuest/x11rockerstudio/issues/1)
+
+Following the [short packaging guide](http://subuser.org/packaging.html), the subuser `subrstudio` can be found in the directory of the same name.
+The Dockerfile starts with the `libx11` Subuser image, which in turn is based on Debian (see [libx11 SubuserImagefile](https://github.com/subuser-security/subuser-default-repository/blob/latest/libx11/image/SubuserImagefile) and [libdebian SubuserImagefile](https://github.com/subuser-security/subuser-default-repository/blob/latest/libdebian/image/SubuserImagefile) in the [subuser default repository](https://github.com/subuser-security/subuser-default-repository)).
+
+```bash
+# add required libx11
+subuser subuser add libx11 libx11@default
+
+# build the subuser locally
+subuser subuser add subrstudio subrstudio@./
+
+# see if it is installed
+subuser list installed-images
+
+# run it
+subuser run subrstudio
+
+# remove it
+subuser subuser remove subrstudio
+```
+
+This approach could probably extended by providing a stack of subusers, e.g. `subr-base`, `subr-verse`, `subr-rstudio` etc.
 
 ## Conclusion
 
@@ -75,12 +103,13 @@ A small advantage could exist using the first approach, at least for users with 
 Things are containerized though, so there is some advantage for reproducibility, if users do not mount relevant stuff into the container.
 
 `x11docker` go to great lengths to handle security issues around exposing an X server, not all of which I can grasp at this point, and hides all that complexity from the user with (probably) sensible defaults.
+Subuser follows a similar approach based on [xpra](https://xpra.org/) to better control the containers rights.
 
-As pointed out in the blog post discussion [here](http://fabiorehm.com/blog/2014/09/11/running-gui-apps-with-docker/#comment-1973698881), Docker is faster than firing up a whole VM and in this case Docker does not only share the Kernel but also the X11 display.
+As pointed out in the blog post discussion [here](http://fabiorehm.com/blog/2014/09/11/running-gui-apps-with-docker/#comment-1973698881), Docker is faster than firing up a whole VM and in all cases presented here, a Docker host does not only share the Kernel but also the X11 display with the container.
 
 > _"The downside as mentioned a couple places is the security implications of letting the container watch ALL X11 traffic."_
 
-It is left to each users discretion to decide if this works for her.
+It is left to each users discretion to decide which of these approaches work for her, i.e. which level of permission control are acceptible and which supporting project is trustworthy.
 
 ## License
 

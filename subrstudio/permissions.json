@@ -1,0 +1,12 @@
+{
+ "maintainer": "Daniel <daniel.nuest@uni-muenster.de>",
+ "executable": "/usr/lib/rstudio/bin/rstudio",
+ "allow-network-access": true,
+ "basic-common-permissions": true,
+ "description": "RStudio IDE for R",
+ "gui": {
+  "clipboard": true,
+  "system-tray": true,
+  "cursors": true
+ }
+}
