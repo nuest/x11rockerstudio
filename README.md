@@ -53,7 +53,7 @@ This partially shows x11docker works, and how user settings are translated to Do
 
 ### X11 socket sharing with Rocker base images
 
-This approach works quite well and is most lightweight, because there is no full desktop in the container. But it also has security implications (see also `x11docker`'s README on the topic).
+This approach works quite well and is most lightweight, because there is no full desktop in the container.
 
 ```bash
 docker build --tag rstudioxhost --file xhost/Dockerfile .
@@ -68,6 +68,14 @@ docker run -it --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix rstudio
 ```
 
 You can even create one Docker image that has both RStudio variants if you use `rocker/rstudio` as the base image.
+
+#### X11 and Docker
+
+On Linux, we simply forward our X11 info with the Docker container. This sections provides some background and resources on GUI applications in Docker, including security implications, because the container can receive all X11 events that happen on the host computer desktop.
+
+- [`x11docker`'s README on the topic]()
+- http://fabiorehm.com/blog/2014/09/11/running-gui-apps-with-docker/
+- http://wiki.ros.org/docker/Tutorials/GUI with a "simple" way, a "saver way" and an "isolated" way (the approach above uses the _simple_ one!, the _isolated_ requires changes in the Dockerfile), and other alternatives (ssh, VNC)
 
 ### Subuser
 
