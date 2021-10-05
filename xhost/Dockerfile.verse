@@ -3,20 +3,22 @@ FROM rocker/verse
 # Install RStudio
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-    libssl1.0.2 \
     libgstreamer1.0-0 \
     libgstreamer-plugins-base1.0-0 \
     libglu1 \
-    libxcomposite-dev \ 
+    libxcomposite-dev \
     libxslt1-dev \
     libxcb1 \
+    libxcursor1 \
+    libxdamage-dev \
     libx11-xcb1 \
-    libx11-xcb-dev \ 
+    libxkbcommon-x11-0 \
+    libx11-xcb-dev \
     qt5-default
 
 WORKDIR /tmp
-RUN wget -q https://download1.rstudio.org/rstudio-xenial-1.0.153-amd64.deb \
-    && dpkg -i rstudio-xenial-1.0.153-amd64.deb
+RUN wget -q https://download1.rstudio.org/desktop/bionic/amd64/rstudio-2021.09.0-351-amd64.deb \
+    && dpkg -i rstudio-2021.09.0-351-amd64.deb
 
 # Replace 1000 with your user / group id
 RUN export uid=1000 gid=1000 && \
@@ -29,4 +31,6 @@ RUN export uid=1000 gid=1000 && \
 
 USER developer
 ENV HOME /home/developer
+ENV QT_QPA_PLATFORM=xcb
+ENV QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/rstudio/plugins/platforms/
 CMD /usr/lib/rstudio/bin/rstudio
